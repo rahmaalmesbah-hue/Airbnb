@@ -14,6 +14,7 @@ import PropertyDetails from "./Components/PropertyDetails"
 import Login from "./Components/Login"
 import Signup from "./Components/Signup"
 import Checkout from "./Components/Checkout"
+import Profile from "./Components/Profile"
 
 // ==================== HOME PAGE ====================
 
@@ -110,6 +111,7 @@ function App() {
         {/* Property & Booking Pages */}
         <Route path="/property/:id" element={<PropertyDetails />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
 
     </BrowserRouter>

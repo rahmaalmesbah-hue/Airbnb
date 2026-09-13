@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 interface BookingForm {
@@ -31,54 +31,78 @@ export default function Checkout() {
     })
   }
 
-const handleSubmit = (e: SubmitEvent) => {
-   e.preventDefault()
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
 
-  const emailRegex = /\S+@\S+\.\S+/
-  // حذف المسافات من رقم الكارت لو المستخدم كتبها
-  const cleanCardNumber = formData.cardNumber.replace(/\s+/g, '')
-  // Regex للتأكد من تاريخ MM/YY
-  const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/
+    const emailRegex = /\S+@\S+\.\S+/
+    const cleanCardNumber = formData.cardNumber.replace(/\s+/g, '')
+    const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/
 
-  if (!formData.fullName || !formData.email || !formData.phone || !formData.cardNumber || !formData.expiry || !formData.cvv) {
-    setError('Please fill in all required fields')
-    return
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.cardNumber || !formData.expiry || !formData.cvv) {
+      setError('Please fill in all required fields')
+      return
+    }
+
+    if (formData.fullName.trim().length < 3) {
+      setError('Please enter a valid full name')
+      return
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address')
+      return
+    }
+
+    if (formData.phone.length < 10 || isNaN(Number(formData.phone))) {
+      setError('Please enter a valid phone number (digits only)')
+      return
+    }
+
+    if (cleanCardNumber.length !== 16 || isNaN(Number(cleanCardNumber))) {
+      setError('Card number must be exactly 16 digits')
+      return
+    }
+
+    if (!expiryRegex.test(formData.expiry)) {
+      setError('Expiry date must be in MM/YY format (e.g. 12/28)')
+      return
+    }
+
+    if (formData.cvv.length !== 3 || isNaN(Number(formData.cvv))) {
+      setError('CVV must be exactly 3 digits')
+      return
+    }
+
+    setError('')
+
+    // 1. تجهيز بيانات الحجز الجديد
+    const newBooking = {
+      id: Date.now().toString(),
+      propertyTitle: 'Luxury Oceanfront Villa',
+      propertyImage: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      location: 'Malibu, California',
+      checkIn: 'Oct 15, 2026',
+      checkOut: 'Oct 20, 2026',
+      totalPrice: 680,
+      guestName: formData.fullName,
+      guestEmail: formData.email,
+      bookingDate: new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    }
+
+    // 2. قراءة الحجوزات القائمة ثم إضافة الحجز الجديد وحفظهم في localStorage
+    const existingBookings = JSON.parse(localStorage.getItem('myBookings') || '[]')
+    const updatedBookings = [newBooking, ...existingBookings]
+    localStorage.setItem('myBookings', JSON.stringify(updatedBookings))
+
+    // 3. التوجيه لصفحة البروفايل مباشرة
+    alert('Booking confirmed successfully!')
+    navigate('/profile')
   }
 
-  if (formData.fullName.trim().length < 3) {
-    setError('Please enter a valid full name')
-    return
-  }
-
-  if (!emailRegex.test(formData.email)) {
-    setError('Please enter a valid email address')
-    return
-  }
-
-  if (formData.phone.length < 10 || isNaN(Number(formData.phone))) {
-    setError('Please enter a valid phone number (digits only)')
-    return
-  }
-
-  if (cleanCardNumber.length !== 16 || isNaN(Number(cleanCardNumber))) {
-    setError('Card number must be exactly 16 digits')
-    return
-  }
-
-  if (!expiryRegex.test(formData.expiry)) {
-    setError('Expiry date must be in MM/YY format (e.g. 12/28)')
-    return
-  }
-
-  if (formData.cvv.length !== 3 || isNaN(Number(formData.cvv))) {
-    setError('CVV must be exactly 3 digits')
-    return
-  }
-
-  setError('')
-  alert('Booking confirmed successfully!')
-  navigate('/')
-}
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-4xl">
@@ -184,7 +208,7 @@ const handleSubmit = (e: SubmitEvent) => {
 
               <button
                 type="submit"
-                className="mt-4 w-full rounded-lg bg-rose-500 py-3 font-semibold text-white hover:bg-rose-600"
+                className="mt-4 w-full rounded-lg bg-rose-500 py-3 font-semibold text-white hover:bg-rose-600 transition"
               >
                 Confirm Booking
               </button>
