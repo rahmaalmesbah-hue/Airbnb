@@ -1,121 +1,118 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useMemo, useState } from "react"
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom"
 
-function App() {
-  const [count, setCount] = useState(0)
+import Navbar from "./Components/Navbar"
+import CategoryFilter from "./Components/CategoryFilter"
+import PropertyCard from "./Components/PropertyCard"
+import { listingsData } from "./listingsData"
+import PropertyDetails from "./Components/PropertyDetails"
+import Login from "./Components/Login"
+import Signup from "./Components/Signup"
+import Checkout from "./Components/Checkout"
+
+// ==================== HOME PAGE ====================
+
+function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const navigate = useNavigate()
+
+  const filteredListings = useMemo(() => {
+    if (selectedCategory === "All") {
+      return listingsData
+    }
+
+    return listingsData.filter(
+      (listing) => listing.category === selectedCategory
+    )
+  }, [selectedCategory])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+    <div className="min-h-screen bg-white">
+
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Categories */}
+      <CategoryFilter
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
+
+      {/* Main Content */}
+      <main className="mx-auto max-w-7xl px-5 py-8">
+
+        {/* Heading */}
+        <div className="mb-7">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Explore stays
+          </h1>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Find your perfect place to stay
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* Property Grid */}
+        <section className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {filteredListings.map((listing) => (
+            <PropertyCard
+              key={listing.id}
+              listing={listing}
+              onClick={() => {
+                navigate(`/property/${listing.id}`)
+              }}
+            />
+          ))}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        </section>
+
+        {/* No Results */}
+        {filteredListings.length === 0 && (
+          <div className="py-20 text-center">
+
+            <h2 className="text-xl font-semibold">
+              No properties found
+            </h2>
+
+            <p className="mt-2 text-gray-500">
+              Try another category.
+            </p>
+
+          </div>
+        )}
+
+      </main>
+    </div>
+  )
+}
+
+// ==================== APP ====================
+
+function App() {
+  return (
+    <BrowserRouter>
+
+      <Routes>
+        
+        {/* Home */}
+        <Route path="/" element={<Home />} />
+
+        {/* Auth Pages */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Property & Booking Pages */}
+        <Route path="/property/:id" element={<PropertyDetails />} />
+        <Route path="/checkout" element={<Checkout />} />
+      </Routes>
+
+    </BrowserRouter>
   )
 }
 
