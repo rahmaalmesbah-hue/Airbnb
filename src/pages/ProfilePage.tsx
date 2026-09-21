@@ -6,7 +6,7 @@ import { BOOKINGS_KEY, type Booking } from "../types/booking";
 export function ProfilePage() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
-
+/* Dependency array مرة واحدة لما اشغل البروفايل اول مرة مش مع كل تغيير*/
   useEffect(() => {
     const savedBookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || "[]") as Booking[];
     setBookings(savedBookings);
