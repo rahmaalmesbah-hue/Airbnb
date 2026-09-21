@@ -12,6 +12,7 @@ export function ProfilePage() {
     setBookings(savedBookings);
   }, []);
 
+  /*ternary operator*/ 
   const userInfo =
     bookings.length > 0
       ? { name: bookings[0].guestName, email: bookings[0].guestEmail }
