@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { Property } from "../data/property";
 import { BOOKINGS_KEY, type Booking, type BookingDraft } from "../types/booking";
@@ -43,7 +43,7 @@ export function CheckoutPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
 
     const emailRegex = /\S+@\S+\.\S+/;
