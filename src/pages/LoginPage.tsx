@@ -10,7 +10,6 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // استخدام React.SubmitEvent لمعالجة حدث إرسال النموذج
   const handleLogin = (e: React.SubmitEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -32,7 +31,6 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    // --- التحقق من الحساب المسجل في localStorage ---
     const registeredUsers = JSON.parse(localStorage.getItem("registered_users") || "[]");
 
     const foundUser = registeredUsers.find(
